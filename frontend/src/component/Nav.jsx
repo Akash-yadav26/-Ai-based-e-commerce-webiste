@@ -94,7 +94,7 @@ function Nav() {
        <button className='text-[white] flex items-center justify-center flex-col gap-[2px]' > <IoMdHome  className='w-[24px] h-[28px] text-[white] md:hidden' onClick={()=> nevigate("/")} /> Home</button>
        <button className='text-[white] flex items-center justify-center flex-col gap-[2px]' > <MdOutlineCollectionsBookmark  className='w-[24px] h-[28px] text-[white] md:hidden' onClick={()=> nevigate("/collections")} /> Collections</button>
        <button className='text-[white] flex items-center justify-center flex-col gap-[2px] '> <TiContacts  className='w-[24px] h-[28px] text-[white] md:hidden' onClick={()=> nevigate("/contact")}/>Contact</button>
-       <button className='text-[white] flex items-center justify-center flex-col gap-[2px]'l> <IoBagOutline className='w-[24px] h-[28px] text-[white] md:hidden'onClick={()=> nevigate("/cart")}/>Cart</button>
+       <button className='text-[white] flex items-center justify-center flex-col gap-[2px]'> <IoBagOutline className='w-[24px] h-[28px] text-[white] md:hidden'onClick={()=> nevigate("/cart")}/>Cart</button>
        <p className='absolute w-[18px] h-[18px] flex items-center justify-center bg-white px-[5px] py-[2px] text-black font-semibold  rounded-full text-[9px] top-[8px] right-[18px]'>{getCartCount()}</p>
    </div>
    </div>

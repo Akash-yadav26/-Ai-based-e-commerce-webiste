@@ -94,6 +94,23 @@ const updateQuantity = async (itemId , size , quantity) => {
       
     }
  
+ const getCartAmount = () => {
+    let totalAmount = 0;
+    for (const items in cartItem) {
+      let itemInfo = products.find((product) => product._id === items);
+      for (const item in cartItem[items]) {
+        try {
+          if (cartItem[items][item] > 0) {
+            totalAmount += itemInfo.price * cartItem[items][item];
+          }
+        } catch (error) {
+          // product not found
+        }
+      }
+    }
+    return totalAmount;
+  }
+
  const getCartCount = () => {
     let totalCount = 0;
     for (const items in cartItem) {
@@ -118,7 +135,7 @@ useEffect(()=>{
 }, [])
 
      let value={
-        products,currency,delivery_fee,getProducts,search,setSearch,showSearch,setShowSearch,cartItem,addtoCart,getCartCount,setCartItem
+        products,currency,delivery_fee,getProducts,search,setSearch,showSearch,setShowSearch,cartItem,addtoCart,getCartCount,getCartAmount,updateQuantity,setCartItem
     }
   return (
    

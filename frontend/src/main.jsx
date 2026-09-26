@@ -6,6 +6,8 @@ import App from './App.jsx'
 import Authcontext from './context/Authcontext.jsx'
 import UserContext from './context/UserContext.jsx'
 import ShopContext from './context/ShopContext.jsx'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -13,6 +15,7 @@ createRoot(document.getElementById('root')).render(
   <UserContext>
   <ShopContext> 
    <App />
+   <ToastContainer />
    </ShopContext> 
    </UserContext>
    </Authcontext>
