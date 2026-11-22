@@ -14,8 +14,7 @@
     "dotenv": "^17.2.0",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.16.4",
-    "stitchlyn-microservices-ecosystem": "file:../.."
+    "mongoose": "^8.16.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
