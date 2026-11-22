@@ -9,7 +9,7 @@ import { IoSearch } from "react-icons/io5";
 import { motion } from "framer-motion";
 import { Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { authDataContext } from '../context/authcontext';
+import { authDataContext } from '../context/Authcontext';
 import { IoMdHome } from "react-icons/io";
 import { MdOutlineCollectionsBookmark } from "react-icons/md";
 import { TiContacts } from "react-icons/ti";
