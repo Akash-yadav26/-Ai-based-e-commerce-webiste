@@ -6,9 +6,12 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  packages: write
+
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ${{ github.repository }}
 
 jobs:
   # Stage 1: Automated Linting & Testing
@@ -71,6 +74,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Sanitize Image Name
+        id: meta
+        run: |
+          # Convert username to lowercase and strip all spaces/special characters for valid Docker tag reference
+          CLEAN_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]//g')
+          IMAGE_PATH="${{ env.REGISTRY }}/${CLEAN_OWNER}/stitchlyn-${{ matrix.service }}"
+          echo "image_path=${IMAGE_PATH}" >> $GITHUB_OUTPUT
+          echo "Building image tag: ${IMAGE_PATH}:latest"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -87,8 +99,8 @@ jobs:
           context: ./services/${{ matrix.service }}
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:latest
-            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:${{ github.sha }}
+            ${{ steps.meta.outputs.image_path }}:latest
+            ${{ steps.meta.outputs.image_path }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -96,7 +108,8 @@ jobs:
   deploy:
     name: Continuous Deployment to K8s
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
+    # Only run deploy if on main and KUBECONFIG secret is configured
+    if: github.ref == 'refs/heads/main' && secrets.KUBECONFIG != ''
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -124,4 +137,3 @@ jobs:
           kubectl rollout status deployment/product-service -n stitchlyn --timeout=120s
           kubectl rollout status deployment/cart-service -n stitchlyn --timeout=120s
           kubectl rollout status deployment/order-service -n stitchlyn --timeout=120s
-
