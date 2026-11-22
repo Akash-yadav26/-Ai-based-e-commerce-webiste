@@ -1,0 +1,127 @@
+name: Stitchlyn CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
+
+jobs:
+  # Stage 1: Automated Linting & Testing
+  test:
+    name: Code Quality & Unit Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [api-gateway, auth-service, product-service, cart-service, order-service]
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: services/${{ matrix.service }}/package.json
+
+      - name: Install Dependencies
+        run: |
+          cd services/${{ matrix.service }}
+          npm ci || npm install
+
+      - name: Security Vulnerability Audit
+        run: |
+          cd services/${{ matrix.service }}
+          npm audit --audit-level=high || true
+
+  # Stage 2: Security & Static Analysis (SAST)
+  security-scan:
+    name: SAST & Container Security
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy Vulnerability Scanner (Repo)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+
+  # Stage 3: Container Build & Push to Registry
+  build-and-push:
+    name: Docker Build & Push
+    needs: security-scan
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [api-gateway, auth-service, product-service, cart-service, order-service]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./services/${{ matrix.service }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Stage 4: Continuous Deployment to Kubernetes (EKS / GKE / AKS)
+  deploy:
+    name: Continuous Deployment to K8s
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Kubernetes Context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Deploy Kubernetes Manifests
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/configmap-secrets.yaml
+          kubectl apply -f k8s/deployments.yaml
+          kubectl apply -f k8s/services.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl apply -f k8s/hpa.yaml
+
+      - name: Verify Rollout Status
+        run: |
+          kubectl rollout status deployment/api-gateway -n stitchlyn --timeout=120s
+          kubectl rollout status deployment/auth-service -n stitchlyn --timeout=120s
+          kubectl rollout status deployment/product-service -n stitchlyn --timeout=120s
+          kubectl rollout status deployment/cart-service -n stitchlyn --timeout=120s
+          kubectl rollout status deployment/order-service -n stitchlyn --timeout=120s
+

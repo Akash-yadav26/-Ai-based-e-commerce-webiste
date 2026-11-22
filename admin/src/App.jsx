@@ -18,8 +18,10 @@ function App() {
   <Route path='/' element={<Home/>}  />
   <Route path='/add' element ={<Add/>} />
   <Route path='/lists' element ={<Lists/>} />
+  <Route path='/Lists' element ={<Lists/>} />
   <Route path='/login' element ={<Login/>} />
   <Route path='/order' element ={<Order/>} />
+  <Route path='/orders' element ={<Order/>} />
 </Routes>
     </>
 }

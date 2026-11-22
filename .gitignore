@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+*/node_modules/
+*/*/node_modules/
+
+# Environment Variables & Secrets
+.env
+.env.local
+*.env
+
+# Submission Archives & Binary Packages
+Stitchlyn_Project_Submission.zip
+2401331540033.zip
+*.zip
+*.tar
+*.gz
+
+# Generated PDF Reports & Documents
+Stitchlyn_DevOps_Architecture_Report.pdf
+*.pdf
+
+# Production & Build Outputs
+dist/
+build/
+out/
+public/temp/
+*.log
+
+# Editor & OS Specific
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+

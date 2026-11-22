@@ -1,0 +1,21 @@
+{
+  "name": "stitchlyn-microservices-ecosystem",
+  "version": "1.0.0",
+  "description": "Stitchlyn Full-Stack Microservices Architecture",
+  "scripts": {
+    "install:all": "npm --prefix services/api-gateway install && npm --prefix services/auth-service install && npm --prefix services/product-service install && npm --prefix services/cart-service install && npm --prefix services/order-service install && npm --prefix frontend install && npm --prefix admin install",
+    "dev:gateway": "npm --prefix services/api-gateway run dev",
+    "dev:auth": "npm --prefix services/auth-service run dev",
+    "dev:product": "npm --prefix services/product-service run dev",
+    "dev:cart": "npm --prefix services/cart-service run dev",
+    "dev:order": "npm --prefix services/order-service run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:admin": "npm --prefix admin run dev",
+    "dev:services": "concurrently -n \"GATEWAY,AUTH,PRODUCT,CART,ORDER\" -c \"magenta,blue,green,yellow,cyan\" \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:product\" \"npm run dev:cart\" \"npm run dev:order\"",
+    "dev:all": "concurrently -n \"GATEWAY,AUTH,PRODUCT,CART,ORDER,FRONTEND,ADMIN\" -c \"magenta,blue,green,yellow,cyan,red,gray\" \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:product\" \"npm run dev:cart\" \"npm run dev:order\" \"npm run dev:frontend\" \"npm run dev:admin\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
+

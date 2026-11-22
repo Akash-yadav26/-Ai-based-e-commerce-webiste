@@ -5,7 +5,8 @@ import uploadImage from '../assets/upload image.jpg'
 import { useContext } from 'react'
 import { authDataContext } from '../context/AuthContext'
 import axios from 'axios'
-import Loading from '../component/Loading' 
+import Loading from '../component/Loading'
+import { toast } from 'react-toastify'
 
 
 function Add() {

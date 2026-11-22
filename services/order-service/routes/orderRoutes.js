@@ -1,0 +1,26 @@
+import express from 'express';
+import isAuth from '../middleware/isAuth.js';
+import adminAuth from '../middleware/adminAuth.js';
+import {
+    allOrders,
+    placeOrder,
+    placeOrderRazorpay,
+    updateStatus,
+    userOrders,
+    verifyRazorpay
+} from '../controller/orderController.js';
+
+const orderRoutes = express.Router();
+
+// User endpoints
+orderRoutes.post("/placeorder", isAuth, placeOrder);
+orderRoutes.post("/razorpay", isAuth, placeOrderRazorpay);
+orderRoutes.post("/userorder", isAuth, userOrders);
+orderRoutes.post("/verifyrazorpay", isAuth, verifyRazorpay);
+
+// Admin endpoints
+orderRoutes.post("/list", adminAuth, allOrders);
+orderRoutes.post("/status", adminAuth, updateStatus);
+
+export default orderRoutes;
+

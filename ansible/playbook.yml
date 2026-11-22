@@ -1,0 +1,43 @@
+---
+- name: Configure and Deploy Stitchlyn Microservices Production Nodes
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Update apt cache and install prerequisites
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - git
+          - ufw
+        state: present
+        update_cache: yes
+
+    - name: Install Docker CE
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Ensure Docker service is running and enabled
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Configure UFW Firewall rules
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - 80
+        - 443
+        - 5001
+
+    - name: Deploy Stitchlyn Docker Compose Stack
+      community.docker.docker_compose_v2:
+        project_src: /opt/stitchlyn
+        state: present
+

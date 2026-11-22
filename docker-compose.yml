@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # 1. API Gateway
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+    container_name: stitchlyn-api-gateway
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - AUTH_SERVICE_URL=http://auth-service:5002
+      - PRODUCT_SERVICE_URL=http://product-service:5003
+      - CART_SERVICE_URL=http://cart-service:5004
+      - ORDER_SERVICE_URL=http://order-service:5005
+    depends_on:
+      - auth-service
+      - product-service
+      - cart-service
+      - order-service
+    networks:
+      - stitchlyn-network
+
+  # 2. Auth & User Service
+  auth-service:
+    build:
+      context: ./services/auth-service
+    container_name: stitchlyn-auth-service
+    ports:
+      - "5002:5002"
+    env_file:
+      - ./services/auth-service/.env
+    networks:
+      - stitchlyn-network
+
+  # 3. Product Catalog Service
+  product-service:
+    build:
+      context: ./services/product-service
+    container_name: stitchlyn-product-service
+    ports:
+      - "5003:5003"
+    env_file:
+      - ./services/product-service/.env
+    networks:
+      - stitchlyn-network
+
+  # 4. Cart Service
+  cart-service:
+    build:
+      context: ./services/cart-service
+    container_name: stitchlyn-cart-service
+    ports:
+      - "5004:5004"
+    env_file:
+      - ./services/cart-service/.env
+    networks:
+      - stitchlyn-network
+
+  # 5. Order & Payment Gateway Service
+  order-service:
+    build:
+      context: ./services/order-service
+    container_name: stitchlyn-order-service
+    ports:
+      - "5005:5005"
+    env_file:
+      - ./services/order-service/.env
+    networks:
+      - stitchlyn-network
+
+networks:
+  stitchlyn-network:
+    driver: bridge
+

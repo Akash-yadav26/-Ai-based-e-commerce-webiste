@@ -7,6 +7,7 @@ import cors from "cors"
 import userRoutes from './routes/userRoutes.js'
 import ProductRoutes from './routes/ProductRoutes.js'
 import cartRoutes from './routes/CartRoutes.js'
+import orderRoutes from './routes/orderRoutes.js'
 
 dotenv.config();
 let Port = process.env.PORT || 6000;
@@ -22,6 +23,7 @@ app.use("/api/auth",authRoutes)
 app.use("/api/user",userRoutes)
 app.use("/api/product",ProductRoutes)
 app.use("/api/cart",cartRoutes)
+app.use("/api/order",orderRoutes)
 
 app.listen(Port,()=>{console.log("server started at",Port)
  connectDb();
